@@ -13,6 +13,7 @@ JavaFX application developed for the Object-Oriented Systems Development group a
 - Java
 - JavaFX
 - NetBeans
+- IntelliJ
 
 ## Team Project
 This repository contains the Java source files for the Cedar Woods Accommodation System group project.
