@@ -115,7 +115,7 @@ public class CedarWoodSystem {
         return count;
     }
 
-    // --- මෙන්න අලුතින් දාපු Presentation Logic මෙතඩ්ස් 5 (GUI එක හිස් කරන්න) ---
+    
 // Helper methods used by the GUI to display date-based room information
     public String getOccupancyStringForDate(int roomNumber, LocalDate targetDate) {
         Booking b = getBookingForDate(roomNumber, targetDate);
@@ -152,7 +152,7 @@ public class CedarWoodSystem {
         Booking b = getBookingForDate(roomNumber, targetDate);
         return (b != null && b.isBreakfastRequired()) ? "Yes" : "No";
     }
-    // --------------------------------------------------------------------------
+    
     
 // Updates the cleaning status of a room while enforcing valid status rules
     public String updateCleaningStatus(int roomNumber, CleaningStatus newStatus) {
@@ -161,7 +161,7 @@ public class CedarWoodSystem {
         if (selected == null) return "ERROR: Room not found.";
 
         CleaningStatus currentStatus = selected.getCleaningStatus();
-        if (currentStatus == newStatus) return "SUCCESS";
+        if (currentStatus == newStatus) return "SUCCESS: No status change needed.";
 
         if (currentStatus == CleaningStatus.Maintenance && newStatus == CleaningStatus.Clean) {
             return "ERROR: Maintenance must be set to 'Dirty' first for thorough cleaning.";
@@ -176,7 +176,9 @@ public class CedarWoodSystem {
             return "ERROR: First Name, Last Name, and Telephone cannot be empty.";
         }
         if (checkInDate == null) return "ERROR: Please select a valid Check-In Date.";
-
+        if (checkInDate.isBefore(LocalDate.now())) {
+    return "ERROR: Check-in date cannot be in the past.";
+}
         int numGuests;
         int nights;
         try {
@@ -191,9 +193,12 @@ public class CedarWoodSystem {
         Accommodation selected = getAccommodationByNumber(roomNumber);
 
         if (selected == null) return "ERROR: Room not found.";
-        if (selected.getCleaningStatus() == CleaningStatus.Dirty || selected.getCleaningStatus() == CleaningStatus.Maintenance) {
-            return "ERROR: Room is Dirty or in Maintenance!";
-        }
+        
+        // Only today’s booking is blocked by the room’s current dirty/maintenance state.
+        if (checkInDate.equals(LocalDate.now()) &&
+    (selected.getCleaningStatus() == CleaningStatus.Dirty || selected.getCleaningStatus() == CleaningStatus.Maintenance)) {
+    return "ERROR: Room is Dirty or in Maintenance!";
+}
         if (!selected.validateCapacity(numGuests)) {
             return "ERROR: Exceeds maximum capacity of " + selected.getMaxOccupancy() + " guests.";
         }
@@ -216,38 +221,35 @@ public class CedarWoodSystem {
         Booking newBooking = new Booking(newGuest, selected, checkInDate, nights, breakfast, numGuests);
 
         bookings.add(newBooking);
-        guests.add(newGuest);
-
-        if (!checkInDate.isAfter(LocalDate.now())) {
-            selected.setOccupied(OccupancyStatus.Occupied);
-        }
+        guests.add(newGuest); 
+// This makes the room become occupied only when the booking starts today.
+        if (checkInDate.equals(LocalDate.now())) {
+    selected.setOccupied(OccupancyStatus.Occupied);
+}
 
         return "SUCCESS! Guest Checked In. Booking ID: " + newBooking.getBookingId() + " | Total: £" + newBooking.getTotalCost();
     }
 
-// Completes the active booking for the given room and checkout date
-    public String checkOutGuest(int roomNumber, LocalDate checkoutDate) {
-        Accommodation selected = getAccommodationByNumber(roomNumber);
-
-        if (selected == null) return "ERROR: Room not found.";
-
-        // Find the booking active for the requested checkout date
-        Booking currentBooking = getBookingForDate(roomNumber, checkoutDate);
-
-       // Check-out is only allowed when an active booking exists for the selected date
-        if (currentBooking != null) {
-            currentBooking.completeBooking(); // Complete the historical record
-
-            // Only clear physical room status if the checkout date is today
-            if (checkoutDate.equals(LocalDate.now())) {
-                selected.setOccupied(OccupancyStatus.Unoccupied);
-                selected.updateCleaningStatus(CleaningStatus.Dirty);
-                return "SUCCESS! Checked Out booking for " + checkoutDate + ". Room marked as Dirty.";
-            }
-            return "SUCCESS! Checked Out future/past booking for " + checkoutDate + ".";
-        } else {
-            // If no active booking exists for that date, return an error message
-            return "ERROR: No active booking found for this room on " + checkoutDate + ".";
-        }
+// Completes today's active booking for the selected room and marks the room as dirty
+   public String checkOutGuest(int roomNumber, LocalDate checkoutDate) {
+    if (!checkoutDate.equals(LocalDate.now())) {
+        return "ERROR: Check-out can only be completed for today's active stay.";
     }
+
+    Accommodation selected = getAccommodationByNumber(roomNumber);
+    if (selected == null) return "ERROR: Room not found.";
+
+    Booking currentBooking = getBookingForDate(roomNumber, LocalDate.now());
+
+    // Check-out is only allowed when an active booking exists for today
+    if (currentBooking != null) {
+        currentBooking.completeBooking();
+        selected.setOccupied(OccupancyStatus.Unoccupied);
+        selected.updateCleaningStatus(CleaningStatus.Dirty);
+        return "SUCCESS! Guest checked out. Room marked as Dirty.";
+    } else {
+        // If no active booking exists for that date, return an error message
+        return "ERROR: No active booking found for this room today.";
+    }
+}
 }

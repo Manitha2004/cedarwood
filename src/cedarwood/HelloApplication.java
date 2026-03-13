@@ -1,7 +1,5 @@
 
 package cedarwood;
-
-import cedarwood.CedarWoodSystem;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -60,7 +58,7 @@ public class HelloApplication extends Application {
         // Start the live clock so the label updates every second
         startClock(lblClock);
        
-        /*HBox topBox = new HBox(15);
+        /* HBox topBox = new HBox(15);
         topBox.setAlignment(Pos.CENTER_LEFT);
         topBox.setPadding(new Insets(10));
 
@@ -167,7 +165,7 @@ public class HelloApplication extends Application {
         recGrid.add(new Label("Check In Date:"), 0, 4); recGrid.add(dpCheckInDate, 1, 4);
         recGrid.add(new Label("Number Nights:"), 0, 5); recGrid.add(txtNights, 1, 5);
         recGrid.add(chkBreakfast, 1, 6);
-// Action buttons for guest check-in and check-out
+        // Action buttons for guest check-in and check-out
         Button btnCheckIn = new Button("Check In");
         Button btnCheckOut = new Button("Check Out");
         HBox btnBox = new HBox(20, btnCheckIn, btnCheckOut);
@@ -178,7 +176,7 @@ public class HelloApplication extends Application {
 
         lblStatusMessage = new Label();
         lblStatusMessage.setPadding(new Insets(5, 10, 5, 10));
-// Main application layout: header at top, table in center, controls and messages at bottom
+        // Main application layout: header at top, table in center, controls and messages at bottom
         BorderPane mainPane = new BorderPane();
         mainPane.setTop(headerArea);
         mainPane.setCenter(table);
@@ -257,10 +255,11 @@ public class HelloApplication extends Application {
     private void setupTable() {
         // Create the main table used to display accommodation details
         table = new TableView<>();
-// Column: accommodation number
+        
+        // Column: accommodation number
         TableColumn<Accommodation, Integer> colNo = new TableColumn<>("No.");
         colNo.setCellValueFactory(new PropertyValueFactory<>("accommodationNumber"));
- // Column: accommodation type
+       // Column: accommodation type
         TableColumn<Accommodation, String> colType = new TableColumn<>("Accomm. Type");
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
 
@@ -275,7 +274,7 @@ public class HelloApplication extends Application {
                 return new SimpleStringProperty(status);
             }
         });
-// Column: room availability for the selected date
+      // Column: room availability for the selected date
         TableColumn<Accommodation, String> colAvailability = new TableColumn<>("Availability");
         colAvailability.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Accommodation, String>, ObservableValue<String>>() {
             @Override
@@ -357,29 +356,34 @@ public class HelloApplication extends Application {
         if (result.startsWith("SUCCESS")) {
             updateTableAndStats();
             showMessage(result, "green");
-            txtFName.clear(); txtLName.clear(); txtPhone.clear(); txtGuests.clear(); txtNights.clear(); chkBreakfast.setSelected(false); dpCheckInDate.setValue(LocalDate.now());
+            txtFName.clear();
+            txtLName.clear();
+            txtPhone.clear();
+            txtGuests.clear();
+            txtNights.clear();
+            chkBreakfast.setSelected(false);
+            dpCheckInDate.setValue(LocalDate.now());
         } else {
             showMessage(result, "red");
         }
     }
-// Handles guest check-out for the selected accommodation on the selected view date
-    private void handleCheckOut() {
-        Accommodation selected = table.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showMessage("Please select a room to check out.", "red");
-            return;
-        }
-
-        LocalDate viewDate = dpViewDate.getValue() != null ? dpViewDate.getValue() : LocalDate.now();
-        String result = cedarSystem.checkOutGuest(selected.getAccommodationNumber(), viewDate);
-
-        if (result.startsWith("SUCCESS")) {
-            updateTableAndStats();
-            showMessage(result, "green");
-        } else {
-            showMessage(result, "red");
-        }
+// Handles guest check-out for the selected accommodation using today's date
+   private void handleCheckOut() {
+    Accommodation selected = table.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+        showMessage("Please select a room to check out.", "red");
+        return;
     }
+
+    String result = cedarSystem.checkOutGuest(selected.getAccommodationNumber(), LocalDate.now());
+
+    if (result.startsWith("SUCCESS")) {
+        updateTableAndStats();
+        showMessage(result, "green");
+    } else {
+        showMessage(result, "red");
+    }
+}
 // Displays a coloured status message at the bottom of the interface
     private void showMessage(String msg, String color) {
         lblStatusMessage.setText(msg);
@@ -387,23 +391,28 @@ public class HelloApplication extends Application {
     }
     
     // Updates the given label every second to show the current time and date
-   private void startClock(Label lblClock) {
-       // Formatter for the time display, e.g. 5:02 AM
+private void startClock(Label lblClock) {
+    // Formatter for the time display, e.g. 5:02 AM
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
+
     // Formatter for the date display, e.g. 3/13/2026
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-// Timeline runs repeatedly and refreshes the label every second
+
+    // Timeline runs repeatedly and refreshes the label every second
     Timeline timeline = new Timeline(
         new KeyFrame(Duration.seconds(0), e -> {
-             // Get the current system date and time
+            // Get the current system date and time
             LocalDateTime now = LocalDateTime.now();
+
             // Show time on the first line and date on the second line
             lblClock.setText(now.format(timeFormatter) + "\n" + now.format(dateFormatter));
         }),
         new KeyFrame(Duration.seconds(1))
     );
-// Repeat forever while the application is running
+
+    // Repeat forever while the application is running
     timeline.setCycleCount(Timeline.INDEFINITE);
+
     // Start the clock animation
     timeline.play();
 }
