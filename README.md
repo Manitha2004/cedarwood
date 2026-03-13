@@ -12,20 +12,18 @@ This system is designed for the fictional **Cedar Woods** accommodation site and
 ## Project Overview
 
 The application manages four accommodation areas:
-
 - Hilltop
 - Meadow
 - Woodland
-- LakeView
+- Lakeview
 
 It also supports four accommodation types:
-
 - Cabin
 - Yurt
 - Geodesic Dome
 - Airstream
 
-The software was built using **Java** and **JavaFX** and follows an object-oriented design with:
+The software was developed using **Java** and **JavaFX** and follows an object-oriented design with:
 - model classes
 - controller/business logic
 - JavaFX user interface
@@ -39,8 +37,8 @@ The software was built using **Java** and **JavaFX** and follows an object-orien
 - Update room cleaning status
 - View breakfast statistics for the selected date
 - View current rooms requiring cleaning
-- Live clock displayed in the GUI
-- Windows packaged version with application icon
+- Display a live clock in the GUI
+- Packaged Windows version with application icon
 
 ## Main Classes
 
@@ -82,7 +80,7 @@ The project uses object-oriented principles such as:
 - encapsulation
 - separation of concerns
 
-`Accommodation` is an abstract parent class that contains shared properties and behavior for all room types.
+`Accommodation` is an abstract parent class that contains shared properties and behaviour for all accommodation types.
 
 `CedarWoodSystem` acts as the main controller and handles:
 - accommodation management
@@ -99,15 +97,24 @@ This project does **not** use a database.
 All data is handled **in memory while the application is running**.  
 This was a deliberate design decision because the assignment brief stated that **data persistence was not required**.
 
+## Project Structure
+
+- `src/cedarwood` – Java source code
+- `nbproject` – NetBeans project configuration
+- `build.xml` – NetBeans build file
+- `manifest.mf` – project manifest
+- `README.md` – project overview and usage notes
+
 ## How to Run the Project
 
 ### In NetBeans
 1. Open the project in NetBeans
-2. Make sure JavaFX is configured
+2. Make sure JavaFX is configured correctly
 3. Run `HelloApplication`
 
 ### As a Windows Application
-The project was also packaged as a Windows application using `jpackage`.
+The project was also packaged as a Windows application using `jpackage`.  
+Run the generated installer and then open the installed application from the desktop shortcut or Start menu.
 
 ## GitHub Repository Purpose
 
