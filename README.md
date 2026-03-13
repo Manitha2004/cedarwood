@@ -73,6 +73,8 @@ The software was built using **Java** and **JavaFX** and follows an object-orien
 - JavaFX
 - NetBeans
 - GitHub
+- Intelij
+  
 
 ## System Design
 
