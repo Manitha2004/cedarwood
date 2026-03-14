@@ -1,7 +1,5 @@
 
 package cedarwood;
-
-import cedarwood.CedarWoodSystem;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -25,7 +23,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDate;
-
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+import javafx.animation.ScaleTransition;
+import javafx.scene.layout.Region;
+import javafx.scene.media.AudioClip;
+ 
 
 public class HelloApplication extends Application {
     
@@ -46,7 +49,7 @@ public class HelloApplication extends Application {
     private CheckBox chkBreakfast;
 // Bottom status label used to show success and error messages
     private Label lblStatusMessage;
-    
+   private HBox statsBox;
     
     
     @Override
@@ -56,11 +59,12 @@ public class HelloApplication extends Application {
         Label lblClock = new Label();
         // Style the clock label so the time and date are clearly visible
         lblClock.setAlignment(Pos.CENTER_RIGHT);
-        lblClock.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+lblClock.getStyleClass().add("header-label");
+lblClock.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
         // Start the live clock so the label updates every second
         startClock(lblClock);
        
-        /*HBox topBox = new HBox(15);
+        /* HBox topBox = new HBox(15);
         topBox.setAlignment(Pos.CENTER_LEFT);
         topBox.setPadding(new Insets(10));
 
@@ -87,23 +91,31 @@ public class HelloApplication extends Application {
         dpViewDate.setPrefWidth(120);
 
         HBox leftBox = new HBox(15);
-        leftBox.setAlignment(Pos.CENTER_LEFT);
-        leftBox.getChildren().addAll(
-        new Label("Area:"), comboArea,
-        new Label("Select Date to View:"), dpViewDate
-     );
+leftBox.setAlignment(Pos.CENTER_LEFT);
+
+Label lblArea = new Label("Area:");
+Label lblViewDate = new Label("Select Date to View:");
+lblArea.getStyleClass().add("header-label");
+lblViewDate.getStyleClass().add("header-label");
+
+leftBox.getChildren().addAll(
+    lblArea, comboArea,
+    lblViewDate, dpViewDate
+);
         // Right-side container for the clock display
         HBox rightBox = new HBox(5);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
         rightBox.getChildren().addAll(lblClock);
        // Top layout: area/date controls on the left, live clock on the right
        BorderPane topBox = new BorderPane();
-       topBox.setPadding(new Insets(10));
-       topBox.setLeft(leftBox);
-       topBox.setRight(rightBox);
+topBox.setPadding(new Insets(10));
+topBox.setLeft(leftBox);
+topBox.setRight(rightBox);
+topBox.getStyleClass().add("header-box");
 // Statistics section showing breakfasts for the selected date and current dirty rooms
-       HBox statsBox = new HBox(20);
+        statsBox = new HBox(20);
        
+       statsBox.getStyleClass().add("stats-box");
         statsBox.setPadding(new Insets(5, 10, 15, 10));
         txtBreakfastStats = new TextField("0");
         txtBreakfastStats.setEditable(false);
@@ -124,6 +136,8 @@ public class HelloApplication extends Application {
 // Left panel contains maintenance controls and selected room details
         VBox leftPanel = new VBox(10);
         leftPanel.setPrefWidth(350);
+        leftPanel.getStyleClass().add("panel-card");
+        addCardHoverAnimation(leftPanel);
 
         choiceCleaningStatus = new ChoiceBox<>();
         choiceCleaningStatus.getItems().addAll(CleaningStatus.values());
@@ -141,10 +155,25 @@ public class HelloApplication extends Application {
         infoGrid.add(new Label("Accommodates:"), 0, 2); infoGrid.add(txtInfoAccommodates, 1, 2);
         infoGrid.add(new Label("Price Per Night (£):"), 0, 3); infoGrid.add(txtInfoPrice, 1, 3);
 
-        leftPanel.getChildren().addAll(new Label("Room Maintenance"), new HBox(10, new Label("Cleaning Status:"), choiceCleaningStatus), new Separator(), new Label("Accommodation Info"), infoGrid);
+        Label lblRoomMaintenance = new Label("Room Maintenance");
+Label lblAccommodationInfo = new Label("Accommodation Info");
+lblRoomMaintenance.getStyleClass().add("section-title");
+lblAccommodationInfo.getStyleClass().add("section-title");
+
+leftPanel.getChildren().addAll(
+    lblRoomMaintenance,
+    new HBox(10, new Label("Cleaning Status:"), choiceCleaningStatus),
+    new Separator(),
+    lblAccommodationInfo,
+    infoGrid
+);
 // Right panel contains the reception form for guest check-in and check-out
+
+
         VBox rightPanel = new VBox(10);
         rightPanel.setPrefWidth(400);
+        rightPanel.getStyleClass().add("panel-card");
+        addCardHoverAnimation(rightPanel);
 
         GridPane recGrid = new GridPane();
         recGrid.setVgap(8);
@@ -167,19 +196,33 @@ public class HelloApplication extends Application {
         recGrid.add(new Label("Check In Date:"), 0, 4); recGrid.add(dpCheckInDate, 1, 4);
         recGrid.add(new Label("Number Nights:"), 0, 5); recGrid.add(txtNights, 1, 5);
         recGrid.add(chkBreakfast, 1, 6);
-// Action buttons for guest check-in and check-out
+        // Action buttons for guest check-in and check-out
         Button btnCheckIn = new Button("Check In");
         Button btnCheckOut = new Button("Check Out");
+        btnCheckIn.getStyleClass().add("check-in-button");
+btnCheckOut.getStyleClass().add("check-out-button");
+
+addButtonHoverAnimation(btnCheckIn);
+addButtonHoverAnimation(btnCheckOut);
+
+addButtonClickAnimation(btnCheckIn);
+addButtonClickAnimation(btnCheckOut);
+
         HBox btnBox = new HBox(20, btnCheckIn, btnCheckOut);
         btnBox.setAlignment(Pos.CENTER_RIGHT);
 
-        rightPanel.getChildren().addAll(new Label("Accommodation Reception"), recGrid, btnBox);
+        Label lblReception = new Label("Accommodation Reception");
+lblReception.getStyleClass().add("section-title");
+
+rightPanel.getChildren().addAll(lblReception, recGrid, btnBox);
         bottomBox.getChildren().addAll(leftPanel, new Separator(), rightPanel);
 
         lblStatusMessage = new Label();
         lblStatusMessage.setPadding(new Insets(5, 10, 5, 10));
-// Main application layout: header at top, table in center, controls and messages at bottom
+        lblStatusMessage.getStyleClass().add("status-label");
+        // Main application layout: header at top, table in center, controls and messages at bottom
         BorderPane mainPane = new BorderPane();
+        mainPane.getStyleClass().add("main-pane");
         mainPane.setTop(headerArea);
         mainPane.setCenter(table);
         mainPane.setBottom(new VBox(bottomBox, lblStatusMessage));
@@ -248,19 +291,48 @@ public class HelloApplication extends Application {
         });
 
         updateTableAndStats();
+mainPane.setOpacity(0);
+      Scene scene = new Scene(mainPane, 850, 650);
 
-        Scene scene = new Scene(mainPane, 850, 650);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+var cssUrl = HelloApplication.class.getResource("style.css");
+System.out.println("CSS URL = " + cssUrl);
+
+if (cssUrl != null) {
+    scene.getStylesheets().add(cssUrl.toExternalForm());
+}
+
+leftPanel.setTranslateX(-120);
+
+TranslateTransition leftSlide = new TranslateTransition(Duration.seconds(2.0), leftPanel);
+leftSlide.setFromX(-120);
+leftSlide.setToX(0);
+
+rightPanel.setOpacity(0);
+
+FadeTransition rightFade = new FadeTransition(Duration.seconds(2.2), rightPanel);
+rightFade.setFromValue(0);
+rightFade.setToValue(1);
+
+primaryStage.setScene(scene);
+primaryStage.show();
+FadeTransition windowFade = new FadeTransition(Duration.seconds(2.5), mainPane);
+windowFade.setFromValue(0);
+windowFade.setToValue(1);
+windowFade.play();
+
+leftSlide.play();
+rightFade.play();
+playStartupSound();
     }
 
     private void setupTable() {
         // Create the main table used to display accommodation details
         table = new TableView<>();
-// Column: accommodation number
+        
+        // Column: accommodation number
         TableColumn<Accommodation, Integer> colNo = new TableColumn<>("No.");
         colNo.setCellValueFactory(new PropertyValueFactory<>("accommodationNumber"));
- // Column: accommodation type
+       // Column: accommodation type
         TableColumn<Accommodation, String> colType = new TableColumn<>("Accomm. Type");
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
 
@@ -275,7 +347,7 @@ public class HelloApplication extends Application {
                 return new SimpleStringProperty(status);
             }
         });
-// Column: room availability for the selected date
+      // Column: room availability for the selected date
         TableColumn<Accommodation, String> colAvailability = new TableColumn<>("Availability");
         colAvailability.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Accommodation, String>, ObservableValue<String>>() {
             @Override
@@ -334,6 +406,8 @@ public class HelloApplication extends Application {
 
         txtCleaningStats.setText(String.valueOf(cedarSystem.getCleaningCount(area)));
         txtBreakfastStats.setText(String.valueOf(cedarSystem.getBreakfastCount(area, statsDate)));
+          animateTableRefresh();
+          animateStatsBox();
     }
 // Handles guest check-in using the selected accommodation and form input values
     private void handleCheckIn() {
@@ -357,55 +431,138 @@ public class HelloApplication extends Application {
         if (result.startsWith("SUCCESS")) {
             updateTableAndStats();
             showMessage(result, "green");
-            txtFName.clear(); txtLName.clear(); txtPhone.clear(); txtGuests.clear(); txtNights.clear(); chkBreakfast.setSelected(false); dpCheckInDate.setValue(LocalDate.now());
+            txtFName.clear();
+            txtLName.clear();
+            txtPhone.clear();
+            txtGuests.clear();
+            txtNights.clear();
+            chkBreakfast.setSelected(false);
+            dpCheckInDate.setValue(LocalDate.now());
         } else {
             showMessage(result, "red");
         }
     }
-// Handles guest check-out for the selected accommodation on the selected view date
-    private void handleCheckOut() {
-        Accommodation selected = table.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showMessage("Please select a room to check out.", "red");
-            return;
-        }
-
-        LocalDate viewDate = dpViewDate.getValue() != null ? dpViewDate.getValue() : LocalDate.now();
-        String result = cedarSystem.checkOutGuest(selected.getAccommodationNumber(), viewDate);
-
-        if (result.startsWith("SUCCESS")) {
-            updateTableAndStats();
-            showMessage(result, "green");
-        } else {
-            showMessage(result, "red");
-        }
+// Handles guest check-out for the selected accommodation using today's date
+   private void handleCheckOut() {
+    Accommodation selected = table.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+        showMessage("Please select a room to check out.", "red");
+        return;
     }
+
+    String result = cedarSystem.checkOutGuest(selected.getAccommodationNumber(), LocalDate.now());
+
+    if (result.startsWith("SUCCESS")) {
+        updateTableAndStats();
+        showMessage(result, "green");
+    } else {
+        showMessage(result, "red");
+    }
+}
 // Displays a coloured status message at the bottom of the interface
     private void showMessage(String msg, String color) {
         lblStatusMessage.setText(msg);
         lblStatusMessage.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold; -fx-font-size: 14px;");
+         lblStatusMessage.setOpacity(0);
+
+    FadeTransition fade = new FadeTransition(Duration.seconds(0.6), lblStatusMessage);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+    fade.play();
     }
     
     // Updates the given label every second to show the current time and date
-   private void startClock(Label lblClock) {
-       // Formatter for the time display, e.g. 5:02 AM
+private void startClock(Label lblClock) {
+    // Formatter for the time display, e.g. 5:02 AM
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
+
     // Formatter for the date display, e.g. 3/13/2026
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-// Timeline runs repeatedly and refreshes the label every second
+
+    // Timeline runs repeatedly and refreshes the label every second
     Timeline timeline = new Timeline(
         new KeyFrame(Duration.seconds(0), e -> {
-             // Get the current system date and time
+            // Get the current system date and time
             LocalDateTime now = LocalDateTime.now();
+
             // Show time on the first line and date on the second line
             lblClock.setText(now.format(timeFormatter) + "\n" + now.format(dateFormatter));
         }),
         new KeyFrame(Duration.seconds(1))
     );
-// Repeat forever while the application is running
+
+    // Repeat forever while the application is running
     timeline.setCycleCount(Timeline.INDEFINITE);
+
     // Start the clock animation
     timeline.play();
+}
+private void addButtonHoverAnimation(Button button) {
+    ScaleTransition scaleUp = new ScaleTransition(Duration.seconds(0.2), button);
+    scaleUp.setToX(1.05);
+    scaleUp.setToY(1.05);
+
+    ScaleTransition scaleDown = new ScaleTransition(Duration.seconds(0.2), button);
+    scaleDown.setToX(1.0);
+    scaleDown.setToY(1.0);
+
+    button.setOnMouseEntered(e -> scaleUp.playFromStart());
+    button.setOnMouseExited(e -> scaleDown.playFromStart());
+}
+private void animateTableRefresh() {
+    table.setOpacity(0);
+
+    FadeTransition fade = new FadeTransition(Duration.seconds(0.5), table);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+    fade.play();
+}
+private void animateStatsBox() {
+    statsBox.setOpacity(0);
+
+    FadeTransition fade = new FadeTransition(Duration.seconds(0.5), statsBox);
+    fade.setFromValue(0);
+    fade.setToValue(1);
+    fade.play();
+}
+private void addCardHoverAnimation(Region card) {
+    ScaleTransition scaleUp = new ScaleTransition(Duration.seconds(0.2), card);
+    scaleUp.setToX(1.02);
+    scaleUp.setToY(1.02);
+
+    ScaleTransition scaleDown = new ScaleTransition(Duration.seconds(0.2), card);
+    scaleDown.setToX(1.0);
+    scaleDown.setToY(1.0);
+
+    card.setOnMouseEntered(e -> scaleUp.playFromStart());
+    card.setOnMouseExited(e -> scaleDown.playFromStart());
+}
+private void addButtonClickAnimation(Button button) {
+    button.setOnMousePressed(e -> {
+        ScaleTransition press = new ScaleTransition(Duration.seconds(0.1), button);
+        press.setToX(0.96);
+        press.setToY(0.96);
+        press.playFromStart();
+    });
+
+    button.setOnMouseReleased(e -> {
+        ScaleTransition release = new ScaleTransition(Duration.seconds(0.1), button);
+        release.setToX(1.05);
+        release.setToY(1.05);
+        release.playFromStart();
+    });
+}
+private void playStartupSound() {
+    var soundUrl = HelloApplication.class.getResource("startup.wav");
+    System.out.println("Sound URL = " + soundUrl);
+
+    if (soundUrl != null) {
+        AudioClip clip = new AudioClip(soundUrl.toExternalForm());
+        clip.setVolume(0.5);
+        clip.play();
+    } else {
+        System.out.println("startup.wav not found");
+    }
 }
 // Launches the JavaFX application
     public static void main(String[] args) {

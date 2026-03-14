@@ -1,0 +1,108 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #f4f6f8;
+}
+
+.main-pane {
+    -fx-background-color: #f4f6f8;
+}
+
+.header-box {
+    -fx-background-color: linear-gradient(to right, #2c3e50, #34495e);
+    -fx-padding: 12;
+    -fx-background-radius: 0 0 12 12;
+}
+
+.header-label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.stats-box {
+    -fx-background-color: white;
+    -fx-padding: 12;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #dfe6e9;
+}
+
+.panel-card {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #dfe6e9;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.text-field,
+.combo-box,
+.date-picker,
+.choice-box {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #cfd8dc;
+    -fx-padding: 6 8 6 8;
+}
+
+.button {
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.check-in-button {
+    -fx-background-color: #27ae60;
+}
+
+.check-in-button:hover {
+    -fx-background-color: #219150;
+}
+
+.check-out-button {
+    -fx-background-color: #c0392b;
+}
+
+.check-out-button:hover {
+    -fx-background-color: #a93226;
+}
+
+.status-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #dfe6e9;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #34495e;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #d6eaf8;
+}
