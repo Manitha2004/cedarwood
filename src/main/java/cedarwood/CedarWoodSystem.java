@@ -106,25 +106,35 @@ LocalDate cOut = b.getCheckOutDate();
     return null;
 }
     
- public Booking getBookingForDisplayDate(int roomNumber, LocalDate date) {
+public Booking getBookingForDisplayDate(int roomNumber, LocalDate date) {
     if (date == null) {
         date = LocalDate.now();
     }
 
     for (Booking b : bookings) {
-        if (b.getAccommodation().getAccommodationNumber() == roomNumber && b.isActive()) {
-            LocalDate cIn = b.getCheckInDate();
-            LocalDate cOut = b.getCheckOutDate();
+        if (b.getAccommodation().getAccommodationNumber() != roomNumber || !b.isActive()) {
+            continue;
+        }
 
-            if (!date.isBefore(cIn) && date.isBefore(cOut)) {
-                return b;
-            }
+        LocalDate cIn = b.getCheckInDate();
+        LocalDate cOut = b.getCheckOutDate();
+
+        // Normal selected-date range: [check-in, check-out)
+        if (!date.isBefore(cIn) && date.isBefore(cOut)) {
+            return b;
+        }
+
+        // Extra rule for the leaving day:
+        // still show the stay only if the guest is truly still in-house
+        if (date.equals(cOut)
+                && b.isCheckedIn()
+                && b.getActualCheckOutDate() == null) {
+            return b;
         }
     }
-    return null;
 
- 
- } 
+    return null;
+}
  public Booking getHistoricalBookingForDate(int roomNumber, LocalDate date) {
     if (date == null) {
         return null;

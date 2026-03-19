@@ -766,7 +766,7 @@ playStartupSound();
 
          // The table does not contain business logic here.
         // It simply gets the correct display value from the controller.
-        TableColumn<Accommodation, String> colOccupancy = new TableColumn<>("Occupancy");
+        TableColumn<Accommodation, String> colOccupancy = new TableColumn<>("Stay Status");
         colOccupancy.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Accommodation, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<Accommodation, String> cell) {
@@ -1235,7 +1235,7 @@ updateCheckInButtonText();
         showMessage(result, "red");
     }
 } 
- private void refreshSelectedRoomPanel() {
+private void refreshSelectedRoomPanel() {
     Accommodation selected = table.getSelectionModel().getSelectedItem();
 
     if (selected != null) {
@@ -1243,22 +1243,38 @@ updateCheckInButtonText();
         txtInfoNumber.setText(String.valueOf(selected.getAccommodationNumber()));
         txtInfoAccommodates.setText(String.valueOf(selected.getMaxOccupancy()));
         txtInfoPrice.setText(String.valueOf(selected.getPricePerNight()));
-        choiceCleaningStatus.setValue(
-                cedarSystem.getCleaningStatusForDate(
-                        selected.getAccommodationNumber(),
-                        dpViewDate.getValue()
-                )
-        );
-       if (btnHistoryView != null && btnHistoryView.isSelected()) {
-    choiceCleaningStatus.setDisable(true);
-} else {
-    choiceCleaningStatus.setDisable(
-            cedarSystem.isRoomOccupiedOnDate(
+
+        boolean historyMode = btnHistoryView != null && btnHistoryView.isSelected();
+        LocalDate selectedDate = dpViewDate.getValue();
+
+        CleaningStatus displayedStatus;
+
+        if (historyMode) {
+            String historicalStatusText = cedarSystem.getHistoricalCleaningStatusStringForDate(
                     selected.getAccommodationNumber(),
-                    dpViewDate.getValue()
-            )
-    );
-};
+                    selectedDate
+            );
+            displayedStatus = CleaningStatus.valueOf(historicalStatusText);
+        } else {
+            displayedStatus = cedarSystem.getCleaningStatusForDate(
+                    selected.getAccommodationNumber(),
+                    selectedDate
+            );
+        }
+
+        choiceCleaningStatus.setValue(displayedStatus);
+
+        if (historyMode) {
+            choiceCleaningStatus.setDisable(true);
+        } else {
+            choiceCleaningStatus.setDisable(
+                    cedarSystem.isRoomOccupiedOnDate(
+                            selected.getAccommodationNumber(),
+                            selectedDate
+                    )
+            );
+        }
+
     } else {
         txtInfoType.clear();
         txtInfoNumber.clear();
