@@ -989,7 +989,7 @@ if (btnHistoryView != null && btnHistoryView.isSelected()) {
         if (row.isEmpty()) {
             row.setStyle("");
         } else if (row.isSelected()) {
-            row.setStyle("-fx-background-color: #dbeafe; -fx-border-color: #3b82f6; -fx-border-width: 0 0 2 0;");
+            row.setStyle("-fx-background-color: #f5f3ff; -fx-border-color: #7c3aed; -fx-border-width: 0 0 0 4;");
         } else if (isNowHover) {
             row.setStyle("-fx-background-color: #f8fafc;");
         } else {
@@ -1001,7 +1001,7 @@ if (btnHistoryView != null && btnHistoryView.isSelected()) {
         if (row.isEmpty()) {
             row.setStyle("");
         } else if (isNowSelected) {
-            row.setStyle("-fx-background-color: #dbeafe; -fx-border-color: #3b82f6; -fx-border-width: 0 0 2 0;");
+          row.setStyle("-fx-background-color: #f5f3ff; -fx-border-color: #7c3aed; -fx-border-width: 0 0 0 4;");
         } else if (row.isHover()) {
             row.setStyle("-fx-background-color: #f8fafc;");
         } else {

@@ -104,7 +104,15 @@
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #d6eaf8;
+    -fx-background-color: #f5f3ff;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #1f2937;
+}
+
+.table-view:focused .table-row-cell:selected .table-cell {
+    -fx-text-fill: #1f2937;
 }
 .reset-button {
     -fx-background-color: linear-gradient(to right, #b91c1c, #991b1b);

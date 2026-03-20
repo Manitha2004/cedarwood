@@ -284,7 +284,7 @@ private CleaningStatus getDerivedCleaningStatusForDate(int roomNumber, LocalDate
 // Helper methods used by the GUI to display date-based room information
     public String getOccupancyStringForDate(int roomNumber, LocalDate targetDate) {
     Booking b = getBookingForDisplayDate(roomNumber, targetDate);
-    return (b != null && b.isCheckedIn()) ? "Occupied" : "Unoccupied";
+    return (b != null) ? "Occupied" : "Unoccupied";
 }
     public boolean isRoomOccupiedOnDate(int roomNumber, LocalDate targetDate) {
     Booking b = getBookingForDisplayDate(roomNumber, targetDate);
@@ -495,7 +495,8 @@ todayBooking.setCheckedIn(true);
 todayBooking.setActualCheckInDate(checkInDate);
 selected.setOccupied(OccupancyStatus.Occupied);
 
-return "SUCCESS! Guest checked in. Booking ID: " + todayBooking.getBookingId();
+return "SUCCESS! Guest checked in. Booking ID: " + todayBooking.getBookingId()
+        + " | Total: £" + todayBooking.getTotalCost();
    }
    
 // Completes today's active booking for the selected room and marks the room as dirty
@@ -513,11 +514,16 @@ return "SUCCESS! Guest checked in. Booking ID: " + todayBooking.getBookingId();
         return "ERROR: Room not found.";
     }
 
+    if (selected.getOccupancyStatus() != OccupancyStatus.Occupied) {
+        return "ERROR: Room is not currently occupied.";
+    }
+
     Booking currentBooking = null;
 
     for (Booking b : bookings) {
         if (b.getAccommodation().getAccommodationNumber() == roomNumber
                 && b.isActive()
+                && b.isCheckedIn()
                 && b.getCheckOutDate().equals(checkoutDate)) {
             currentBooking = b;
             break;
@@ -525,16 +531,18 @@ return "SUCCESS! Guest checked in. Booking ID: " + todayBooking.getBookingId();
     }
 
     if (currentBooking == null) {
-        return "ERROR: No active booking found checking out today.";
+        return "ERROR: No checked-in guest found checking out today.";
     }
-    currentBooking.setCheckedIn(false);
-currentBooking.setActualCheckOutDate(checkoutDate);
-currentBooking.completeBooking();
-selected.setOccupied(OccupancyStatus.Unoccupied);
-selected.updateCleaningStatus(CleaningStatus.Dirty);
-recordCleaningStatus(roomNumber, checkoutDate, CleaningStatus.Dirty);
 
-return "SUCCESS! Guest checked out. Room marked as Dirty.";
+    currentBooking.setCheckedIn(false);
+    currentBooking.setActualCheckOutDate(checkoutDate);
+    currentBooking.completeBooking();
+
+    selected.setOccupied(OccupancyStatus.Unoccupied);
+    selected.updateCleaningStatus(CleaningStatus.Dirty);
+    recordCleaningStatus(roomNumber, checkoutDate, CleaningStatus.Dirty);
+
+    return "SUCCESS! Guest checked out. Room marked as Dirty.";
 }
    public String undoTodayCheckIn(int roomNumber) {
     Accommodation selected = getAccommodationByNumber(roomNumber);
@@ -694,9 +702,15 @@ Booking.resetIdCounter();
         return false;
     }
 
+    Accommodation selected = getAccommodationByNumber(roomNumber);
+    if (selected == null || selected.getOccupancyStatus() != OccupancyStatus.Occupied) {
+        return false;
+    }
+
     for (Booking b : bookings) {
         if (b.getAccommodation().getAccommodationNumber() == roomNumber
                 && b.isActive()
+                && b.isCheckedIn()
                 && b.getCheckOutDate().equals(checkoutDate)) {
             return true;
         }
@@ -704,7 +718,6 @@ Booking.resetIdCounter();
 
     return false;
 }
-   
    
    public boolean canChangeAccommodation(int roomNumber, LocalDate targetDate) {
     if (targetDate == null) {
