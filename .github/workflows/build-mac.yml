@@ -34,6 +34,7 @@ jobs:
             --input target \
             --main-jar CedarWoodApp-1.0-SNAPSHOT.jar \
             --main-class cedarwood.Launcher \
+             --icon .github/icons/CedarWoodApp.icns \
             --dest output \
             --app-version 1.0 \
             --vendor "Manitha"
