@@ -1,4 +1,6 @@
 
+
+//our code
 package cedarwood;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,6 +30,8 @@ import javafx.animation.TranslateTransition;
 import javafx.animation.ScaleTransition;
 import javafx.scene.layout.Region;
 import javafx.scene.media.AudioClip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
  
 
 public class HelloApplication extends Application {
@@ -54,6 +58,7 @@ private Button btnCheckIn, btnUndoCheckIn, btnCheckOut, btnCancelBooking, btnRes
     private Label lblStatusMessage;
   
    private HBox statsBox;
+   private HBox workspaceBanner;
     
     
     @Override
@@ -89,6 +94,21 @@ lblClock.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: b
         comboArea = new ComboBox<>();
         comboArea.getItems().addAll(AreaType.values());
         comboArea.setValue(AreaType.Hilltop);
+        comboArea.getStyleClass().add("top-area-combo");
+        
+
+comboArea.setButtonCell(new ListCell<AreaType>() {
+    @Override
+    protected void updateItem(AreaType item, boolean empty) {
+        super.updateItem(item, empty);
+
+        if (empty || item == null) {
+            setText(null);
+        } else {
+            setText(item.toString());
+        }
+    }
+});
 
         dpViewDate = new DatePicker(LocalDate.now());
         dpViewDate.setEditable(false);
@@ -98,219 +118,232 @@ lblClock.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: b
         btnHistoryView.setPrefWidth(140);
 
         lblViewMode = new Label("Operational View");
-        lblViewMode.getStyleClass().add("header-label");
+lblViewMode.getStyleClass().add("header-label");
 
-Label lblAreaCard = new Label("AREA");
-lblAreaCard.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 10px; -fx-font-weight: bold;");
+// Top control cards
+Label lblAreaCard = new Label("Selected Area");
+lblAreaCard.getStyleClass().add("filter-card-label");
+comboArea.setPrefWidth(170);
 
-comboArea.setPrefWidth(150);
+ImageView icoArea = createIconView("area.png", 16);
+StackPane icoAreaWrap = new StackPane(icoArea);
+icoAreaWrap.getStyleClass().addAll("top-card-icon-wrap", "icon-area-wrap");
 
-VBox areaCard = new VBox(4);
+
+ImageView icoDate = createIconView("calendar.png", 16);
+StackPane icoDateWrap = new StackPane(icoDate);
+icoDateWrap.getStyleClass().addAll("top-card-icon-wrap", "icon-date-wrap");
+
+ImageView icoView = createIconView("view.png", 16);
+StackPane icoViewWrap = new StackPane(icoView);
+icoViewWrap.getStyleClass().addAll("top-card-icon-wrap", "icon-view-wrap");
+
+HBox areaHeader = new HBox(8, icoAreaWrap, lblAreaCard);
+areaHeader.setAlignment(Pos.CENTER_LEFT);
+
+VBox areaCard = new VBox(8);
 areaCard.setAlignment(Pos.CENTER_LEFT);
-areaCard.setPadding(new Insets(8, 10, 8, 10));
-areaCard.setStyle(
-        "-fx-background-color: rgba(255,255,255,0.10);" +
-        "-fx-background-radius: 14;"
-);
-areaCard.getChildren().addAll(lblAreaCard, comboArea);
+areaCard.getStyleClass().add("top-filter-card");
+areaCard.getChildren().addAll(areaHeader, comboArea);
 
-Label lblDateCard = new Label("VIEW DATE");
-lblDateCard.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 10px; -fx-font-weight: bold;");
+Label lblDateCard = new Label("View Date");
+lblDateCard.getStyleClass().add("filter-card-label");
+dpViewDate.setPrefWidth(165);
 
-dpViewDate.setPrefWidth(145);
+HBox dateHeader = new HBox(8, icoDateWrap, lblDateCard);
+dateHeader.setAlignment(Pos.CENTER_LEFT);
 
-VBox dateCard = new VBox(4);
+VBox dateCard = new VBox(8);
 dateCard.setAlignment(Pos.CENTER_LEFT);
-dateCard.setPadding(new Insets(8, 10, 8, 10));
-dateCard.setStyle(
-        "-fx-background-color: rgba(255,255,255,0.10);" +
-        "-fx-background-radius: 14;"
-);
-dateCard.getChildren().addAll(lblDateCard, dpViewDate);
+dateCard.getStyleClass().add("top-filter-card");
+dateCard.getChildren().addAll(dateHeader, dpViewDate);
 
-Label lblViewCard = new Label("VIEW MODE");
-lblViewCard.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 10px; -fx-font-weight: bold;");
+Label lblViewCard = new Label("View Mode");
+lblViewCard.getStyleClass().add("filter-card-label");
+btnHistoryView.setPrefWidth(185);
 
-btnHistoryView.setPrefWidth(165);
+HBox viewHeader = new HBox(8, icoViewWrap, lblViewCard);
+viewHeader.setAlignment(Pos.CENTER_LEFT);
 
-VBox viewCard = new VBox(4);
+VBox viewCard = new VBox(8);
 viewCard.setAlignment(Pos.CENTER_LEFT);
-viewCard.setPadding(new Insets(8, 10, 8, 10));
-viewCard.setStyle(
-        "-fx-background-color: rgba(255,255,255,0.10);" +
-        "-fx-background-radius: 14;"
-);
-viewCard.getChildren().addAll(lblViewCard, btnHistoryView);
+viewCard.getStyleClass().add("top-filter-card");
+viewCard.getChildren().addAll(viewHeader, btnHistoryView);
 
-HBox controlStrip = new HBox(14);
+HBox controlStrip = new HBox(18);
 controlStrip.setAlignment(Pos.CENTER);
-controlStrip.getChildren().addAll(areaCard, dateCard, viewCard);        
+controlStrip.getChildren().addAll(areaCard, dateCard, viewCard);
 
+// Left title
 Label lblAppTitle = new Label("Cedar Woods Front Desk");
-lblAppTitle.setStyle("-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;");
+lblAppTitle.getStyleClass().add("app-title");
 
 Label lblAppSubtitle = new Label("Operations Dashboard");
-lblAppSubtitle.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 11px;");
+lblAppSubtitle.getStyleClass().add("app-subtitle");
 
-VBox titleBox = new VBox(2);
+VBox titleBox = new VBox(4);
 titleBox.setAlignment(Pos.CENTER_LEFT);
 titleBox.getChildren().addAll(lblAppTitle, lblAppSubtitle);
 
-
+// Right clock card
 btnResetSystem = new Button("Reset System");
 btnResetSystem.getStyleClass().add("reset-button");
+btnResetSystem.setPrefWidth(130);
+btnResetSystem.setMinWidth(130);
+btnResetSystem.setWrapText(false);
 addButtonHoverAnimation(btnResetSystem);
 addButtonClickAnimation(btnResetSystem);
-        // Right-side container for the clock display
-        
-        
-       HBox rightBox = new HBox(10);
-rightBox.setAlignment(Pos.CENTER_RIGHT);
-rightBox.setPadding(new Insets(8, 14, 8, 14));
-rightBox.setStyle(
-        "-fx-background-color: rgba(255,255,255,0.10);" +
-        "-fx-background-radius: 14;"
-);
-rightBox.getChildren().addAll(lblClock);
 
+HBox rightBox = new HBox();
+rightBox.setAlignment(Pos.CENTER);
+rightBox.getStyleClass().add("clock-card");
+rightBox.getChildren().add(lblClock);
+
+// Header wrapper
 BorderPane topBox = new BorderPane();
-topBox.setPadding(new Insets(10));
+topBox.setPadding(new Insets(18, 22, 18, 22));
 topBox.setLeft(titleBox);
 topBox.setCenter(controlStrip);
 topBox.setRight(rightBox);
 topBox.getStyleClass().add("header-box");
 
-BorderPane.setMargin(controlStrip, new Insets(0, 18, 0, 18));
-// Statistics section showing breakfasts for the selected date and current dirty rooms
-        statsBox = new HBox(16);
-statsBox.setAlignment(Pos.CENTER_LEFT);
-statsBox.setPadding(new Insets(8, 10, 14, 10));
+BorderPane.setMargin(controlStrip, new Insets(0, 20, 0, 20));
 
+// Stats row
+statsBox = new HBox(18);
+statsBox.setAlignment(Pos.CENTER_LEFT);
+statsBox.getStyleClass().add("stats-row");
+
+// Breakfast card
 Label lblBreakfastCard = new Label("Breakfast Forecast");
-lblBreakfastCard.getStyleClass().add("section-title");
+lblBreakfastCard.getStyleClass().add("metric-title");
+
+ImageView icoBreakfast = createIconView("breakfast.png", 18);
+StackPane icoBreakfastWrap = new StackPane(icoBreakfast);
+icoBreakfastWrap.getStyleClass().addAll("metric-icon-wrap", "icon-breakfast-wrap");
+
+HBox breakfastHeader = new HBox(10, icoBreakfastWrap, lblBreakfastCard);
+breakfastHeader.setAlignment(Pos.CENTER_LEFT);
 
 txtBreakfastStats = new TextField("0");
 txtBreakfastStats.setEditable(false);
 txtBreakfastStats.setFocusTraversable(false);
 txtBreakfastStats.setMouseTransparent(true);
-txtBreakfastStats.setPrefWidth(100);
 txtBreakfastStats.setAlignment(Pos.CENTER);
-txtBreakfastStats.setStyle(
-    "-fx-font-size: 20px; " +
-    "-fx-font-weight: bold; " +
-    "-fx-background-radius: 10; " +
-    "-fx-border-radius: 10; " +
-    "-fx-background-color: white; " +
-    "-fx-border-color: #d6dde5;"
-);
+txtBreakfastStats.getStyleClass().add("metric-value");
+txtBreakfastStats.setPrefWidth(120);
 
-VBox breakfastCard = new VBox(8);
+Label lblBreakfastSub = new Label("Guests requiring breakfast");
+lblBreakfastSub.getStyleClass().add("metric-subtitle");
+
+VBox breakfastCard = new VBox(10);
 breakfastCard.setAlignment(Pos.CENTER_LEFT);
-breakfastCard.getStyleClass().add("panel-card");
-breakfastCard.setPadding(new Insets(12));
-breakfastCard.setPrefWidth(230);
-breakfastCard.getChildren().addAll(lblBreakfastCard, txtBreakfastStats);
-
+breakfastCard.getStyleClass().add("metric-card");
+breakfastCard.setPrefWidth(240);
+breakfastCard.getChildren().addAll(breakfastHeader, txtBreakfastStats, lblBreakfastSub);
+// Cleaning card
 Label lblCleaningCard = new Label("Rooms Requiring Cleaning");
-lblCleaningCard.getStyleClass().add("section-title");
+lblCleaningCard.getStyleClass().add("metric-title");
+
+ImageView icoCleaning = createIconView("cleaning.png", 18);
+StackPane icoCleaningWrap = new StackPane(icoCleaning);
+icoCleaningWrap.getStyleClass().addAll("metric-icon-wrap", "icon-cleaning-wrap");
+
+HBox cleaningHeader = new HBox(10, icoCleaningWrap, lblCleaningCard);
+cleaningHeader.setAlignment(Pos.CENTER_LEFT);
 
 txtCleaningStats = new TextField("0");
 txtCleaningStats.setEditable(false);
 txtCleaningStats.setFocusTraversable(false);
 txtCleaningStats.setMouseTransparent(true);
-txtCleaningStats.setPrefWidth(100);
 txtCleaningStats.setAlignment(Pos.CENTER);
-txtCleaningStats.setStyle(
-    "-fx-font-size: 20px; " +
-    "-fx-font-weight: bold; " +
-    "-fx-background-radius: 10; " +
-    "-fx-border-radius: 10; " +
-    "-fx-background-color: white; " +
-    "-fx-border-color: #d6dde5;"
-);
+txtCleaningStats.getStyleClass().add("metric-value");
+txtCleaningStats.setPrefWidth(120);
 
-VBox cleaningCard = new VBox(8);
+Label lblCleaningSub = new Label("Daily housekeeping workload");
+lblCleaningSub.getStyleClass().add("metric-subtitle");
+
+VBox cleaningCard = new VBox(10);
 cleaningCard.setAlignment(Pos.CENTER_LEFT);
-cleaningCard.getStyleClass().add("panel-card");
-cleaningCard.setPadding(new Insets(12));
-cleaningCard.setPrefWidth(280);
-cleaningCard.getChildren().addAll(lblCleaningCard, txtCleaningStats);
+cleaningCard.getStyleClass().add("metric-card");
+cleaningCard.setPrefWidth(290);
+cleaningCard.getChildren().addAll(cleaningHeader, txtCleaningStats, lblCleaningSub);
 
+// Live operations summary card
 Label lblOpsTitle = new Label("Live Operations");
 lblOpsTitle.getStyleClass().add("section-title");
 
+Label icoOps = new Label("⚙");
+icoOps.getStyleClass().addAll("metric-icon", "icon-ops");
+
+HBox opsHeader = new HBox(10, icoOps, lblOpsTitle);
+opsHeader.setAlignment(Pos.CENTER_LEFT);
+
 Label lblOpsMode = new Label("Mode: " + lblViewMode.getText());
-lblOpsMode.setStyle(
-        "-fx-text-fill: #334155; " +
-        "-fx-font-size: 12px; " +
-        "-fx-font-weight: bold; " +
-        "-fx-background-color: #eef3f8; " +
-        "-fx-background-radius: 12; " +
-        "-fx-padding: 6 12 6 12;"
-);
+lblOpsMode.getStyleClass().add("ops-chip");
 
 Label lblOpsNote = new Label("Use the top controls to switch area and date.");
-lblOpsNote.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12px;");
+lblOpsNote.getStyleClass().add("ops-note");
 
-VBox summaryCard = new VBox(8);
+VBox summaryCard = new VBox(10);
 summaryCard.setAlignment(Pos.CENTER_LEFT);
-summaryCard.getStyleClass().add("panel-card");
-summaryCard.setPadding(new Insets(12));
+summaryCard.getStyleClass().add("metric-card");
 summaryCard.setMaxWidth(Double.MAX_VALUE);
 HBox.setHgrow(summaryCard, Priority.ALWAYS);
-summaryCard.getChildren().addAll(lblOpsTitle, lblOpsMode, lblOpsNote);
+summaryCard.getChildren().addAll(opsHeader, lblOpsMode, lblOpsNote);
 
 statsBox.getChildren().addAll(breakfastCard, cleaningCard, summaryCard);
 
-VBox headerArea = new VBox(8, topBox, statsBox);
+VBox headerArea = new VBox(14, topBox, statsBox);
+headerArea.setPadding(new Insets(0, 10, 8, 10));
 
         setupTable();
 
-       SplitPane dashboardBody = new SplitPane();
-dashboardBody.setPadding(new Insets(15, 10, 10, 10));
-dashboardBody.setDividerPositions(0.20, 0.76);
+       
 // Left panel contains maintenance controls and selected room details
-        VBox leftPanel = new VBox(10);
-        leftPanel.setMaxWidth(Double.MAX_VALUE);
-HBox.setHgrow(leftPanel, Priority.ALWAYS);
-        leftPanel.setPrefWidth(260);
-        leftPanel.getStyleClass().add("panel-card");
-        addCardHoverAnimation(leftPanel);
+ SplitPane dashboardBody = new SplitPane();
 
-        choiceCleaningStatus = new ChoiceBox<>();
+dashboardBody.setDividerPositions(0.22, 0.75);
+dashboardBody.getStyleClass().add("dashboard-body");
+dashboardBody.setMinWidth(1700);
+dashboardBody.setPrefWidth(1700);
+
+// ===== LEFT PANEL =====
+VBox leftPanel = new VBox(16);
+leftPanel.setMaxWidth(Double.MAX_VALUE);
+HBox.setHgrow(leftPanel, Priority.ALWAYS);
+leftPanel.setPrefWidth(285);
+leftPanel.getStyleClass().addAll("panel-card", "dashboard-shell", "dark-side-card");
+addCardHoverAnimation(leftPanel);
+
+choiceCleaningStatus = new ChoiceBox<>();
 choiceCleaningStatus.getItems().addAll(CleaningStatus.values());
 choiceCleaningStatus.setDisable(true);
+choiceCleaningStatus.setMaxWidth(Double.MAX_VALUE);
+choiceCleaningStatus.getStyleClass().add("maintenance-choice");
 
-        GridPane infoGrid = new GridPane();
-        infoGrid.setVgap(12);
-        infoGrid.setHgap(12);
+GridPane infoGrid = new GridPane();
+infoGrid.setVgap(12);
+infoGrid.setHgap(12);
 
-        ColumnConstraints infoCol1 = new ColumnConstraints();
-        infoCol1.setPercentWidth(50);
-        infoCol1.setHgrow(Priority.ALWAYS);
-        infoCol1.setFillWidth(true);
-
-        ColumnConstraints infoCol2 = new ColumnConstraints();
-        infoCol2.setPercentWidth(50);
-        infoCol2.setHgrow(Priority.ALWAYS);
-        infoCol2.setFillWidth(true);
+ColumnConstraints infoCol1 = new ColumnConstraints();
+infoCol1.setPercentWidth(50);
+infoCol1.setHgrow(Priority.ALWAYS);
+infoCol1.setFillWidth(true);
+  
+ColumnConstraints infoCol2 = new ColumnConstraints();
+infoCol2.setPercentWidth(50);
+infoCol2.setHgrow(Priority.ALWAYS);
+infoCol2.setFillWidth(true);
 
 infoGrid.getColumnConstraints().addAll(infoCol1, infoCol2);
 
-        txtInfoType = new TextField();
+txtInfoType = new TextField();
 txtInfoType.setEditable(false);
 txtInfoType.setFocusTraversable(false);
 txtInfoType.setMouseTransparent(true);
 txtInfoType.setAlignment(Pos.CENTER_LEFT);
 txtInfoType.setMaxWidth(Double.MAX_VALUE);
-txtInfoType.setStyle(
-        "-fx-background-color: white;" +
-        "-fx-border-color: #d6dde5;" +
-        "-fx-background-radius: 12;" +
-        "-fx-border-radius: 12;" +
-        "-fx-font-size: 13px;" +
-        "-fx-font-weight: bold;"
-);
 
 txtInfoNumber = new TextField();
 txtInfoNumber.setEditable(false);
@@ -318,14 +351,6 @@ txtInfoNumber.setFocusTraversable(false);
 txtInfoNumber.setMouseTransparent(true);
 txtInfoNumber.setAlignment(Pos.CENTER_LEFT);
 txtInfoNumber.setMaxWidth(Double.MAX_VALUE);
-txtInfoNumber.setStyle(
-        "-fx-background-color: white;" +
-        "-fx-border-color: #d6dde5;" +
-        "-fx-background-radius: 12;" +
-        "-fx-border-radius: 12;" +
-        "-fx-font-size: 13px;" +
-        "-fx-font-weight: bold;"
-);
 
 txtInfoAccommodates = new TextField();
 txtInfoAccommodates.setEditable(false);
@@ -333,14 +358,6 @@ txtInfoAccommodates.setFocusTraversable(false);
 txtInfoAccommodates.setMouseTransparent(true);
 txtInfoAccommodates.setAlignment(Pos.CENTER_LEFT);
 txtInfoAccommodates.setMaxWidth(Double.MAX_VALUE);
-txtInfoAccommodates.setStyle(
-        "-fx-background-color: white;" +
-        "-fx-border-color: #d6dde5;" +
-        "-fx-background-radius: 12;" +
-        "-fx-border-radius: 12;" +
-        "-fx-font-size: 13px;" +
-        "-fx-font-weight: bold;"
-);
 
 txtInfoPrice = new TextField();
 txtInfoPrice.setEditable(false);
@@ -348,16 +365,8 @@ txtInfoPrice.setFocusTraversable(false);
 txtInfoPrice.setMouseTransparent(true);
 txtInfoPrice.setAlignment(Pos.CENTER_LEFT);
 txtInfoPrice.setMaxWidth(Double.MAX_VALUE);
-txtInfoPrice.setStyle(
-        "-fx-background-color: white;" +
-        "-fx-border-color: #d6dde5;" +
-        "-fx-background-radius: 12;" +
-        "-fx-border-radius: 12;" +
-        "-fx-font-size: 13px;" +
-        "-fx-font-weight: bold;"
-);
 
-       VBox typeTile = createSnapshotTile("Type", txtInfoType);
+VBox typeTile = createSnapshotTile("Type", txtInfoType);
 VBox numberTile = createSnapshotTile("Room No.", txtInfoNumber);
 VBox capacityTile = createSnapshotTile("Capacity", txtInfoAccommodates);
 VBox priceTile = createSnapshotTile("Price / Night (£)", txtInfoPrice);
@@ -367,58 +376,96 @@ infoGrid.add(numberTile, 1, 0);
 infoGrid.add(capacityTile, 0, 1);
 infoGrid.add(priceTile, 1, 1);
 
-       Label lblRoomMaintenance = new Label("Housekeeping Control");
-Label lblAccommodationInfo = new Label("Selected Room Snapshot");
-lblRoomMaintenance.getStyleClass().add("section-title");
-lblAccommodationInfo.getStyleClass().add("section-title");
+ImageView icoHousekeeping = createIconView("housekeeping.png", 18);
+StackPane icoHousekeepingWrap = new StackPane(icoHousekeeping);
+icoHousekeepingWrap.getStyleClass().addAll("metric-icon-wrap", "icon-housekeeping-wrap");
+
+Label lblRoomMaintenance = new Label("Housekeeping & Maintenance");
+lblRoomMaintenance.getStyleClass().add("dark-section-title");
+
+HBox housekeepingTitleRow = new HBox(10, icoHousekeepingWrap, lblRoomMaintenance);
+housekeepingTitleRow.setAlignment(Pos.CENTER_LEFT);
+
+Label lblHousekeepingSub = new Label("Cleaning controls for the selected room");
+lblHousekeepingSub.getStyleClass().add("dark-section-subtitle");
 
 Label lblCleaningStatus = new Label("Cleaning Status");
-lblCleaningStatus.getStyleClass().add("section-title");
+lblCleaningStatus.getStyleClass().add("dark-field-title");
 
-VBox housekeepingCard = new VBox(8);
-housekeepingCard.setPadding(new Insets(8, 0, 8, 0));
+VBox housekeepingCard = new VBox(10);
+housekeepingCard.getStyleClass().add("dark-inner-surface");
 housekeepingCard.getChildren().addAll(lblCleaningStatus, choiceCleaningStatus);
 
-VBox roomSnapshotCard = new VBox(10);
-roomSnapshotCard.setPadding(new Insets(8, 0, 0, 0));
-roomSnapshotCard.getChildren().addAll(lblAccommodationInfo, infoGrid);
+Label lblAccommodationInfo = new Label("Selected Room Snapshot");
+lblAccommodationInfo.getStyleClass().add("dark-section-title");
 
+Label lblSnapshotSub = new Label("Live room details for reception and housekeeping");
+lblSnapshotSub.getStyleClass().add("dark-section-subtitle");
+
+VBox roomSnapshotCard = new VBox(12);
+roomSnapshotCard.getStyleClass().add("dark-inner-surface");
+roomSnapshotCard.getChildren().addAll(lblSnapshotSub, infoGrid);
 VBox.setVgrow(roomSnapshotCard, Priority.ALWAYS);
 
+Button btnUpdateStatus = new Button("Update Status");
+btnUpdateStatus.getStyleClass().add("left-panel-action-button");
+btnUpdateStatus.setMaxWidth(Double.MAX_VALUE);
+addButtonHoverAnimation(btnUpdateStatus);
+addButtonClickAnimation(btnUpdateStatus);
+
+btnUpdateStatus.setOnAction(e -> {
+    if (choiceCleaningStatus.getValue() != null) {
+        choiceCleaningStatus.fireEvent(new ActionEvent());
+    }
+});
+
 leftPanel.getChildren().addAll(
-    lblRoomMaintenance,
-    housekeepingCard,
-    new Separator(),
-    roomSnapshotCard
-); 
-// Right panel contains the reception form for guest check-in and check-out
+        housekeepingTitleRow,
+        lblHousekeepingSub,
+        housekeepingCard,
+        lblAccommodationInfo,
+        roomSnapshotCard,
+        btnUpdateStatus
+);
 
 
-        VBox rightPanel = new VBox(10);
-        rightPanel.setMaxWidth(Double.MAX_VALUE);
-HBox.setHgrow(rightPanel, Priority.ALWAYS);
-       rightPanel.setPrefWidth(340);
-        rightPanel.getStyleClass().add("panel-card");
-        addCardHoverAnimation(rightPanel);
+     // ===== RIGHT / CENTER UNIFIED WORKSPACE =====
+VBox workspaceShell = new VBox(12);
+workspaceShell.setMaxWidth(Double.MAX_VALUE);
+HBox.setHgrow(workspaceShell, Priority.ALWAYS);
+workspaceShell.getStyleClass().addAll("panel-card", "workspace-shell");
+workspaceShell.setPadding(new Insets(16));
+addCardHoverAnimation(workspaceShell);
 
-        GridPane recGrid = new GridPane();
-       recGrid.setVgap(12);
-        recGrid.setHgap(12);
-        ColumnConstraints recCol1 = new ColumnConstraints();
-recCol1.setMinWidth(110);
+// ----- booking side panel inside workspace -----
+VBox bookingSideCard = new VBox(14);
+bookingSideCard.setPrefWidth(360);
+bookingSideCard.setMinWidth(320);
+bookingSideCard.getStyleClass().add("booking-side-card");
+
+GridPane recGrid = new GridPane();
+recGrid.setVgap(10);
+recGrid.setHgap(12);
+
+ColumnConstraints recCol1 = new ColumnConstraints();
+recCol1.setPercentWidth(50);
+recCol1.setHgrow(Priority.ALWAYS);
+recCol1.setFillWidth(true);
 
 ColumnConstraints recCol2 = new ColumnConstraints();
+recCol2.setPercentWidth(50);
 recCol2.setHgrow(Priority.ALWAYS);
 recCol2.setFillWidth(true);
 
 recGrid.getColumnConstraints().addAll(recCol1, recCol2);
-        txtFName = new TextField();
-        txtLName = new TextField();
-        txtPhone = new TextField();
-        txtGuests = new TextField();
-        txtNights = new TextField();
 
-        dpCheckInDate = new DatePicker(LocalDate.now());
+txtFName = new TextField();
+txtLName = new TextField();
+txtPhone = new TextField();
+txtGuests = new TextField();
+txtNights = new TextField();
+
+dpCheckInDate = new DatePicker(LocalDate.now());
 txtFName.setMaxWidth(Double.MAX_VALUE);
 txtLName.setMaxWidth(Double.MAX_VALUE);
 txtPhone.setMaxWidth(Double.MAX_VALUE);
@@ -431,148 +478,162 @@ dpCheckInDate.setOnAction(e -> {
     updateActionButtonsState();
 });
 
+chkBreakfast = new CheckBox("Breakfast Required");
 
-        chkBreakfast = new CheckBox("Breakfast Required");
-        
-       txtNewRoomNumber = new TextField();
+txtNewRoomNumber = new TextField();
 txtNewRoomNumber.setMaxWidth(Double.MAX_VALUE);
 
 btnChangeAccommodation = new Button("Change Accommodation");
 btnChangeAccommodation.setPrefWidth(180);
-btnChangeAccommodation.getStyleClass().add("check-out-button");
+btnChangeAccommodation.getStyleClass().add("soft-action-button");
 addButtonHoverAnimation(btnChangeAccommodation);
 addButtonClickAnimation(btnChangeAccommodation);
-btnChangeAccommodation.setDisable(true); 
+btnChangeAccommodation.setDisable(true);
 
-        VBox firstNameTile = createFormTile("First Name", txtFName);
-        VBox lastNameTile = createFormTile("Last Name", txtLName);
-        VBox phoneTile = createFormTile("Telephone No.", txtPhone);
-        VBox guestsTile = createFormTile("Number Guests", txtGuests);
-        VBox checkInTile = createFormTile("Check In Date", dpCheckInDate);
-        VBox nightsTile = createFormTile("Number Nights", txtNights);
-        VBox breakfastTile = createFormTile("Breakfast", chkBreakfast);
-        VBox newRoomTile = createFormTile("New Room No.", txtNewRoomNumber);
+VBox firstNameTile = createFormTile("First Name", txtFName);
+VBox lastNameTile = createFormTile("Last Name", txtLName);
+VBox phoneTile = createFormTile("Telephone No.", txtPhone);
+VBox guestsTile = createFormTile("Number Guests", txtGuests);
+VBox checkInTile = createFormTile("Check In Date", dpCheckInDate);
+VBox nightsTile = createFormTile("Number Nights", txtNights);
+VBox breakfastTile = createFormTile("Breakfast", chkBreakfast);
+VBox newRoomTile = createFormTile("New Room No.", txtNewRoomNumber);
 
-        recGrid.add(firstNameTile, 0, 0);
-        recGrid.add(lastNameTile, 1, 0);
+recGrid.add(firstNameTile, 0, 0);
+recGrid.add(lastNameTile, 1, 0);
+recGrid.add(phoneTile, 0, 1);
+recGrid.add(guestsTile, 1, 1);
+recGrid.add(checkInTile, 0, 2);
+recGrid.add(nightsTile, 1, 2);
+recGrid.add(breakfastTile, 0, 3);
+recGrid.add(newRoomTile, 1, 3);
 
-        recGrid.add(phoneTile, 0, 1);
-        recGrid.add(guestsTile, 1, 1);
+Label lblReception = new Label("Guest Check-In / Booking");
+lblReception.getStyleClass().add("section-title");
 
-        recGrid.add(checkInTile, 0, 2);
-        recGrid.add(nightsTile, 1, 2);
+Label lblReceptionSub = new Label("Guest details, booking actions, and room changes");
+lblReceptionSub.getStyleClass().add("section-subtitle");
 
-        recGrid.add(breakfastTile, 0, 3);
-        recGrid.add(newRoomTile, 1, 3);
-        
-        // Action buttons for guest check-in and check-out
-         btnCheckIn = new Button("Check In");
-         btnUndoCheckIn = new Button("Undo");
-         btnCheckOut = new Button("Check Out");
-         
-         btnCancelBooking = new Button("Cancel Booking");
-         
-        btnCheckIn.setPrefWidth(120);
-btnCheckOut.setPrefWidth(120);
-btnUndoCheckIn.setPrefWidth(120);
+VBox receptionFormCard = new VBox(12, lblReception, lblReceptionSub, recGrid);
+receptionFormCard.getStyleClass().add("booking-inner-card");
+
+// ----- action buttons under table -----
+btnCheckIn = new Button("Check In");
+btnUndoCheckIn = new Button("Undo Check-In");
+btnCheckOut = new Button("Check Out");
+btnCancelBooking = new Button("Cancel Booking");
+
+btnCheckIn.setPrefWidth(120);
+btnCheckOut.setPrefWidth(140);
+btnUndoCheckIn.setPrefWidth(150);
 btnCancelBooking.setPrefWidth(150);
-btnChangeAccommodation.setPrefWidth(180);
+btnChangeAccommodation.setPrefWidth(190);
 
 btnCancelBooking.setWrapText(true);
 btnUndoCheckIn.setWrapText(true);
 btnChangeAccommodation.setWrapText(true);
-        btnUndoCheckIn.getStyleClass().add("check-out-button");
+
+btnUndoCheckIn.getStyleClass().add("secondary-action-button");
 addButtonHoverAnimation(btnUndoCheckIn);
 addButtonClickAnimation(btnUndoCheckIn);
 
-btnCancelBooking.getStyleClass().add("check-out-button");
+btnCancelBooking.getStyleClass().add("soft-action-button");
 addButtonHoverAnimation(btnCancelBooking);
 addButtonClickAnimation(btnCancelBooking);
-        btnCheckIn.getStyleClass().add("check-in-button");
-btnCheckOut.getStyleClass().add("check-out-button");
-updateCheckInButtonText();
 
+btnCheckIn.getStyleClass().add("primary-action-button");
+btnCheckOut.getStyleClass().add("danger-action-button");
+updateCheckInButtonText();
 
 addButtonHoverAnimation(btnCheckIn);
 addButtonHoverAnimation(btnCheckOut);
-
 addButtonClickAnimation(btnCheckIn);
 addButtonClickAnimation(btnCheckOut);
 
-       Label lblQuickActions = new Label("Quick Actions");
-lblQuickActions.getStyleClass().add("section-title");
-
-HBox quickActionsRow = new HBox(10);
-quickActionsRow.setAlignment(Pos.CENTER_LEFT);
-quickActionsRow.getChildren().addAll(btnCheckIn, btnUndoCheckIn, btnCheckOut);
-
-Label lblBookingActions = new Label("Booking Actions");
-lblBookingActions.getStyleClass().add("section-title");
-
-HBox bookingActionsRow = new HBox(10);
-bookingActionsRow.setAlignment(Pos.CENTER_LEFT);
-bookingActionsRow.getChildren().addAll(btnCancelBooking, btnChangeAccommodation);
-
-VBox btnBox = new VBox(10);
-btnBox.setAlignment(Pos.CENTER_LEFT);
-btnBox.getChildren().addAll(
-        lblQuickActions,
-        quickActionsRow,
-        lblBookingActions,
-        bookingActionsRow
-);
 btnCheckOut.setDisable(true);
 btnUndoCheckIn.setDisable(true);
 btnCancelBooking.setDisable(true);
 btnCheckIn.setDisable(true);
-        Label lblReception = new Label("Accommodation Reception");
-lblReception.getStyleClass().add("section-title");
 
-rightPanel.getChildren().addAll(lblReception, recGrid, btnBox);
-Label lblRoomDashboard = new Label("Room Dashboard");
+Region actionSpacer = new Region();
+HBox.setHgrow(actionSpacer, Priority.ALWAYS);
+
+HBox actionRibbon = new HBox(10);
+actionRibbon.setAlignment(Pos.CENTER_LEFT);
+actionRibbon.getStyleClass().add("action-ribbon");
+actionRibbon.getChildren().addAll(
+        btnCheckIn,
+        btnUndoCheckIn,
+        btnCheckOut,
+        btnCancelBooking,
+        btnChangeAccommodation,
+        actionSpacer,
+        btnResetSystem
+);
+
+// ----- room dashboard title and table -----
+Label lblRoomDashboard = new Label("Rooms Dashboard");
 lblRoomDashboard.getStyleClass().add("section-title");
 
 Label lblDashboardSubtitle = new Label("Live room overview");
-lblDashboardSubtitle.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12px;");
+lblDashboardSubtitle.getStyleClass().add("section-subtitle");
 
-VBox tableCard = new VBox(12);
-tableCard.setPrefWidth(650);
-tableCard.setMaxWidth(Double.MAX_VALUE);
-HBox.setHgrow(tableCard, Priority.ALWAYS);
-tableCard.getStyleClass().add("panel-card");
-tableCard.setPadding(new Insets(12));
-addCardHoverAnimation(tableCard);
+StackPane tableWrapper = new StackPane(table);
+tableWrapper.getStyleClass().add("table-shell");
+VBox.setVgrow(tableWrapper, Priority.ALWAYS);
 
-VBox.setVgrow(table, Priority.ALWAYS);
-
-tableCard.getChildren().addAll(
+VBox tableSection = new VBox(12);
+tableSection.setMaxWidth(Double.MAX_VALUE);
+HBox.setHgrow(tableSection, Priority.ALWAYS);
+tableSection.getChildren().addAll(
         lblRoomDashboard,
         lblDashboardSubtitle,
-        table
+        tableWrapper,
+        actionRibbon
 );
 
-dashboardBody.getItems().addAll(leftPanel, tableCard, rightPanel);
-leftPanel.setMinWidth(240);
-tableCard.setMinWidth(520);
-rightPanel.setMinWidth(320);
-        
+// ----- workspace row: table + booking panel -----
+HBox workspaceRow = new HBox(14);
+workspaceRow.setAlignment(Pos.TOP_LEFT);
+workspaceRow.getChildren().addAll(tableSection, bookingSideCard);
+HBox.setHgrow(tableSection, Priority.ALWAYS);
 
-        lblStatusMessage = new Label();
-        lblStatusMessage.setPadding(new Insets(5, 10, 5, 10));
-        lblStatusMessage.getStyleClass().add("status-label");
-        Region statusSpacer = new Region();
-HBox.setHgrow(statusSpacer, Priority.ALWAYS);
+// put the reception form into booking card
+bookingSideCard.getChildren().addAll(receptionFormCard);
 
-HBox statusBar = new HBox(10, lblStatusMessage, statusSpacer, btnResetSystem);
-statusBar.setAlignment(Pos.CENTER_LEFT);
-statusBar.setPadding(new Insets(5, 10, 5, 10));
+// workspace message banner
+lblStatusMessage = new Label();
+lblStatusMessage.setPadding(new Insets(0, 0, 0, 0));
+lblStatusMessage.getStyleClass().addAll("status-label", "workspace-banner-label");
+
+workspaceBanner = new HBox(lblStatusMessage);
+workspaceBanner.setAlignment(Pos.CENTER_LEFT);
+workspaceBanner.getStyleClass().addAll("workspace-banner", "banner-info");
+workspaceBanner.setVisible(false);
+workspaceBanner.setManaged(false);
+
+// add to unified shell
+workspaceShell.getChildren().addAll(workspaceRow, workspaceBanner);
+
+// add to split pane
+dashboardBody.getItems().addAll(leftPanel, workspaceShell);
+leftPanel.setMinWidth(290);
+workspaceShell.setMinWidth(860);
+
+
         // Main application layout: header at top, table in center, controls and messages at bottom
         BorderPane mainPane = new BorderPane();
-        mainPane.getStyleClass().add("main-pane");
-        mainPane.setTop(headerArea);
-mainPane.setCenter(dashboardBody);
-mainPane.setBottom(statusBar);
-BorderPane.setMargin(dashboardBody, new Insets(0, 10, 0, 10));
+mainPane.getStyleClass().add("main-pane");
+mainPane.setTop(headerArea);
+
+ScrollPane dashboardScroll = new ScrollPane(dashboardBody);
+dashboardScroll.setFitToHeight(true);
+dashboardScroll.setFitToWidth(false);
+dashboardScroll.setPannable(true);
+dashboardScroll.getStyleClass().add("dashboard-scroll");
+
+mainPane.setCenter(dashboardScroll);
+BorderPane.setMargin(dashboardScroll, new Insets(0, 10, 0, 10));
 
        comboArea.setOnAction(new EventHandler<ActionEvent>() {
     @Override
@@ -620,10 +681,22 @@ table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<
             return;
         }
 
-        CleaningStatus currentDisplayedStatus = cedarSystem.getCleaningStatusForDate(
-                selected.getAccommodationNumber(),
-                dpViewDate.getValue()
-        );
+        boolean historyMode = btnHistoryView != null && btnHistoryView.isSelected();
+CleaningStatus currentDisplayedStatus;
+
+if (historyMode) {
+    currentDisplayedStatus = CleaningStatus.valueOf(
+            cedarSystem.getHistoricalCleaningStatusStringForDate(
+                    selected.getAccommodationNumber(),
+                    dpViewDate.getValue()
+            )
+    );
+} else {
+    currentDisplayedStatus = cedarSystem.getCleaningStatusForDate(
+            selected.getAccommodationNumber(),
+            dpViewDate.getValue()
+    );
+}
 
         if (currentDisplayedStatus != newStatus) {
             String result = cedarSystem.updateCleaningStatus(
@@ -717,7 +790,7 @@ btnHistoryView.setOnAction(e -> {
         
 
 mainPane.setOpacity(0);
-      Scene scene = new Scene(mainPane, 1280, 820);
+Scene scene = new Scene(mainPane, 1280, 820);
 primaryStage.setMinWidth(1180);
 primaryStage.setMinHeight(760);
 
@@ -734,21 +807,22 @@ TranslateTransition leftSlide = new TranslateTransition(Duration.seconds(2.0), l
 leftSlide.setFromX(-120);
 leftSlide.setToX(0);
 
-rightPanel.setOpacity(0);
+workspaceShell.setOpacity(0);
 
-FadeTransition rightFade = new FadeTransition(Duration.seconds(2.2), rightPanel);
-rightFade.setFromValue(0);
-rightFade.setToValue(1);
+FadeTransition workspaceFade = new FadeTransition(Duration.seconds(2.2), workspaceShell);
+workspaceFade.setFromValue(0);
+workspaceFade.setToValue(1);
 
 primaryStage.setScene(scene);
 primaryStage.show();
+
 FadeTransition windowFade = new FadeTransition(Duration.seconds(2.5), mainPane);
 windowFade.setFromValue(0);
 windowFade.setToValue(1);
 windowFade.play();
 
 leftSlide.play();
-rightFade.play();
+workspaceFade.play();
 playStartupSound();
     }
 
@@ -801,10 +875,10 @@ if (btnHistoryView != null && btnHistoryView.isSelected()) {
 
         switch (occupancy.toLowerCase()) {
             case "occupied":
-                setStyle("-fx-background-color: #dbeafe; -fx-text-fill: #1d4ed8; -fx-font-weight: bold;");
+               setStyle("-fx-background-color: #ede9fe; -fx-text-fill: #6d28d9; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             case "unoccupied":
-                setStyle("-fx-background-color: #f8fafc; -fx-text-fill: #475569; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #f8fafc; -fx-text-fill: #475569; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             default:
                 setStyle("");
@@ -845,13 +919,14 @@ if (btnHistoryView != null && btnHistoryView.isSelected()) {
 
         switch (availability.toLowerCase()) {
             case "available":
-                setStyle("-fx-background-color: #ecfdf5; -fx-text-fill: #166534; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
+
                 break;
             case "unavailable":
-                setStyle("-fx-background-color: #fef2f2; -fx-text-fill: #991b1b; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             case "n/a":
-                setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #475569; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             default:
                 setStyle("");
@@ -895,13 +970,13 @@ if (btnHistoryView != null && btnHistoryView.isSelected()) {
 
         switch (status.toLowerCase()) {
             case "clean":
-                setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             case "dirty":
-                setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-font-weight: bold;");
+               setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             case "maintenance":
-                setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             default:
                 setStyle("");
@@ -964,10 +1039,10 @@ if (btnHistoryView != null && btnHistoryView.isSelected()) {
 
         switch (breakfast.toLowerCase()) {
             case "yes":
-                setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             case "no":
-                setStyle("-fx-background-color: #f8fafc; -fx-text-fill: #475569; -fx-font-weight: bold;");
+                setStyle("-fx-background-color: #f8fafc; -fx-text-fill: #475569; -fx-font-weight: 700; -fx-background-insets: 4; -fx-background-radius: 12;");
                 break;
             default:
                 setStyle("");
@@ -1286,15 +1361,35 @@ private void refreshSelectedRoomPanel() {
 }
 // Displays a coloured status message at the bottom of the interface
     private void showMessage(String msg, String color) {
-        lblStatusMessage.setText(msg);
-        lblStatusMessage.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: bold; -fx-font-size: 14px;");
-         lblStatusMessage.setOpacity(0);
+    lblStatusMessage.setText(msg);
+    lblStatusMessage.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
 
-    FadeTransition fade = new FadeTransition(Duration.seconds(0.6), lblStatusMessage);
+    workspaceBanner.getStyleClass().removeAll("banner-success", "banner-error", "banner-info", "banner-warn");
+
+    switch (color.toLowerCase()) {
+        case "green":
+            workspaceBanner.getStyleClass().add("banner-success");
+            break;
+        case "red":
+            workspaceBanner.getStyleClass().add("banner-error");
+            break;
+        case "orange":
+            workspaceBanner.getStyleClass().add("banner-warn");
+            break;
+        default:
+            workspaceBanner.getStyleClass().add("banner-info");
+            break;
+    }
+
+    workspaceBanner.setVisible(true);
+    workspaceBanner.setManaged(true);
+
+    workspaceBanner.setOpacity(0);
+    FadeTransition fade = new FadeTransition(Duration.seconds(0.6), workspaceBanner);
     fade.setFromValue(0);
     fade.setToValue(1);
     fade.play();
-    }
+}
     
     // Updates the given label every second to show the current time and date
 private void startClock(Label lblClock) {
@@ -1365,7 +1460,7 @@ private void addCardHoverAnimation(Region card) {
 
 private VBox createSnapshotTile(String title, TextField field) {
     Label lblTitle = new Label(title);
-    lblTitle.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold;");
+lblTitle.getStyleClass().add("tile-label");
 
     VBox tile = new VBox(6);
     tile.setAlignment(Pos.CENTER_LEFT);
@@ -1375,7 +1470,7 @@ private VBox createSnapshotTile(String title, TextField field) {
 }
 private VBox createFormTile(String title, Control control) {
     Label lblTitle = new Label(title);
-    lblTitle.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold;");
+lblTitle.getStyleClass().add("tile-label");
 
     if (control instanceof Region) {
         ((Region) control).setMaxWidth(Double.MAX_VALUE);
@@ -1547,6 +1642,16 @@ private void showHistoryModeHintIfNeeded() {
             showMessage("History view is only meaningful for past/current dates.", "orange");
         }
     }
+}
+
+private ImageView createIconView(String fileName, double size) {
+    Image image = new Image(HelloApplication.class.getResourceAsStream(fileName));
+    ImageView imageView = new ImageView(image);
+    imageView.setFitWidth(size);
+    imageView.setFitHeight(size);
+    imageView.setPreserveRatio(true);
+    imageView.setSmooth(true);
+    return imageView;
 }
 // Launches the JavaFX application
     public static void main(String[] args) {

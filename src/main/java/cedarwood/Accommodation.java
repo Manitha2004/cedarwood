@@ -1,4 +1,4 @@
-
+//our code
 package cedarwood;
 
 public abstract class Accommodation {
